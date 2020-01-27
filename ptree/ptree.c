@@ -23,21 +23,12 @@ static int psCopy(struct prinfo *dst,
 		  const struct task_struct *src,
 		  const unsigned short lvl)
 {
-	/* copy information from task_struct to prinfo */
-	if (dst == NULL || src == NULL)
-		return -1;
-	if (src->real_parent == NULL)
-		dst->parent_pid = 0;
-	else
-		dst->parent_pid = src->real_parent->pid;
-	dst->pid = src->pid;
-	dst->state = src->state;
-	if (src->cred == NULL)
-		dst->uid = 0;
-	else
-		dst->uid = src->cred->uid.val;
-	strcpy(dst->comm, src->comm);
-	dst->level = lvl;
+        get_task_comm(dst->comm,src);
+        dst->state = src->state;
+	dst->uid = __kuid_val(task_uid(src));
+        dst->pid = task_pid_nr(src);
+        dst->parent_pid = task_pid_nr(src->real_parent);
+        dst->level = lvl;
 	return 0;
 }
 
